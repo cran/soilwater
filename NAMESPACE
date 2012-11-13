@@ -1,0 +1,5 @@
+export(cap)
+export(diffusivity)
+export(khy)
+export(swc)
+export(watervolume)

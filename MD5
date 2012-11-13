@@ -1,0 +1,10 @@
+6349476266276b1cd5b349e041d43fd0 *DESCRIPTION
+d32239bcb673463ab874e80d47fae504 *LICENSE
+173130c699a5b94db159b33d3b8f555d *NAMESPACE
+d1c545689344454e0d3a5e3c13c00906 *R/hydraulic_diffusivity.R
+adce589c71a9a85650474ab5eb0308b4 *R/soilwater-package.R
+0e75d8c6960e03c070e108dd9f53c612 *R/volume.R
+40a1524f1e23e5446476e8ebcf4f0dfb *inst/doc/example/SWRC.R
+ea2000978f9ee4f55d06d74ce8ebccb9 *man/geotopbricks-package.Rd
+734cdadbbcac77a7404507864b796204 *man/hydraulic_diffusivity.Rd
+d85b4746a97d1b414233b1776d099e26 *man/watervolume.Rd
