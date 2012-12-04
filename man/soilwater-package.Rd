@@ -1,8 +1,8 @@
 \docType{package}
-\name{geotopbricks-package}
-\alias{geotobricks}
-\alias{geotopbricks-package}
-\title{geotopbricks: Analyzes raster maps as input/output files from the Hydrological Distributed Model GEOtop}
+\name{soilwater-package}
+\alias{soilwater}
+\alias{soilwater-package}
+\title{soilwater: Implements parametric  formulas for soil water retention or conductivity curve}
 \description{
   It contains implementations of parametric formulas for
   soil water retention or conductivity curve. At the
@@ -14,14 +14,14 @@
 }
 \details{
   \tabular{ll}{ Package: \tab soilwater\cr Type: \tab
-  Package\cr Version: \tab 1.0\cr Date: \tab 2012-11-13\cr
+  Package\cr Version: \tab 1.0\cr Date: \tab 2012-12-4\cr
   License: \tab GPL (>= 2)
 
   \cr LazyLoad: \tab yes\cr Suggests: raster \cr }
 }
 \note{
-  geotobricks is a on-going project. All criticism,
-  comments and suggestions are well welcomed.
+  soilwater is a on-going project. All criticism, comments
+  and suggestions are well welcomed.
 
   geotobricks is free software: you can redistribute it
   and/or modify it under the terms of the GNU General
@@ -41,10 +41,11 @@
 }
 \author{
   Emanuele Cordano \email{emanuele.cordano@gmail.org},
-  Fabio Zottele \email{fabio.zottele@fmach.it}
+  Daniele Andreis, Fabio Zottele
+  \email{fabio.zottele@fmach.it}
 }
 \references{
-  \url{wwww.geotop.org}
+  \url{NULL}
 }
 \keyword{GIS,}
 \keyword{hydrology}

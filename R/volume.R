@@ -36,7 +36,7 @@ watervolume <- function(d=H-h,H=1,h=NA,nstep=100,Gamma=1,soilwaterretentioncurve
 	
 	theta <- soilwaterretentioncurve(psi,z=z,...)
 	
-	out <- theta*dz
+	out <- t(theta) %*% dz
 	
 #	out <- NULL
 	

@@ -74,18 +74,21 @@ NULL
 swc <- function (psi=0.5,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,saturation_index=FALSE,type_swc="VanGenuchten",...) {
   
 	
-  if (type_swc!="VanGenuchten") return(NA)
-  
-  psiloc <- psi
-  psi[psi>0] <- 0.0
-  
-  sat_index <- (1+(-alpha*psi)^n)^(-m)
-  
-  theta <- sat_index*(theta_sat-theta_res)+theta_res
-  out <- theta
-  if (saturation_index) out<- sat_index
-  
-  return(out)
+	if (type_swc=="VanGenuchten"){
+		
+		psiloc <- psi
+		psi[psi>0] <- 0.0
+		
+		sat_index <- (1+(-alpha*psi)^n)^(-m)
+		
+	}else{
+		return(NA)
+	}
+	theta <- sat_index*(theta_sat-theta_res)+theta_res
+	out <- theta
+	if (saturation_index) out<- sat_index
+	
+	return(out)
   
 }
 
@@ -100,12 +103,14 @@ NULL
 
 khy <- function (psi=0.5,v=0.5,ksat=0.01,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,type_swc="VanGenuchten",type_khy="Mualem",...) {
   
+  
+  if (type_khy=="Mualem") {
   s <- swc(psi=psi,alpha=alpha,m=m,n=n,theta_sat=theta_sat,theta_res=theta_res,saturation_index=TRUE,...)
   
-  if (type_khy!="Mualem") return(NA)
-  
   k <- ksat*s^v*(1-(1-s^(1/m))^m)^2
-  
+}else{
+	k<- NA
+}
   return(k)
 }
 NULL
