@@ -12,6 +12,8 @@ NULL
 #' @param theta_sat saturated water content
 #' @param theta_res residual water content
 #' @param ksat saturated hydraulic conductivity
+#' @param lambda,b lambda and b exponents in Brook and Corey formula. It is used in case \code{type_swc} and/or \code{type_khy} are equal to \code{BrooksAndCorey}.
+#' @param psi_s psi_s value (capillary fringe) in Brook and Corey formula. It is used in case \code{type_swc} and/or \code{type_khy} are equal to \code{BrooksAndCorey}.
 #' @param v exponent in Mualem Formula for Hydraulic Conductivity
 #' @param saturation_index logical index, If \code{TRUE} (Default) the function \code{swc()} returns soil water content, otherwise a saturation index between 0 and 1.
 #' @param type_swc type of Soil Water Retention Curve. Default is \code{"VanGenuchten"} and actually the only implemented type 
@@ -41,14 +43,18 @@ NULL
 #' for (it in names(D)) {
 #'   
 #'   i=which(names(D)==it)
-#'   D[,i] <- diffusivity(psi=psi,v=v[i],ksat=ks[i],alpha=alpha[i],n=n[i],m=m[i],theta_sat=theta_sat[i],theta_res=theta_res[i])
+#'   D[,i] <- diffusivity(psi=psi,
+#'             v=v[i],ksat=ks[i],alpha=alpha[i],
+#'             n=n[i],m=m[i],theta_sat=theta_sat[i],
+#'             theta_res=theta_res[i])
 #'  
 #' }
 
 #'# plot diffusivity on log scale 
 #' lty <- 1:length(names(D) )
 #' 
-#' plot(psi,D[,1],lty=lty[1],main="Diffusvity vs psi",xlab="psi [m]",ylab="D [m^2/s]",type="l",ylim=range(D),ylog=TRUE)
+#' plot(psi,D[,1],lty=lty[1],main="Diffusvity vs psi",xlab="psi [m]",
+#' ylab="D [m^2/s]",type="l",ylim=range(D),ylog=TRUE)
 #' for (i in 2:ncol(D)) {
 #'   lines(psi,D[,i],lty=lty[i]) 
 #' }
@@ -58,7 +64,8 @@ NULL
 #' # pot diffusivity on log scale 
 #' lty <- 1:length(names(D) )
 #' 
-#' plot(psi,Dinv[,1],lty=lty[1],main="1/Diffusvity vs psi",xlab="psi [m]",ylab="1/D [s/m^2]",type="l",ylim=range(Dinv),ylog=TRUE)
+#' plot(psi,Dinv[,1],lty=lty[1],main="1/Diffusvity vs psi",
+#' xlab="psi [m]",ylab="1/D [s/m^2]",type="l",ylim=range(Dinv),ylog=TRUE)
 #' for (i in 2:ncol(Dinv)) {
 #'   lines(psi,Dinv[,i],lty=lty[i]) 
 #' }
@@ -71,8 +78,9 @@ NULL
 
 #  soil water retention curves 
 
-swc <- function (psi=0.5,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,saturation_index=FALSE,type_swc="VanGenuchten",...) {
+swc <- function (psi=0.5,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,psi_s=-1/alpha,lambda=m*n,saturation_index=FALSE,type_swc=c("VanGenuchten","BrooksAndCorey"),...) {
   
+	if (length(type_swc)>0) type_swc <- type_swc[1]
 	
 	if (type_swc=="VanGenuchten"){
 		
@@ -81,7 +89,14 @@ swc <- function (psi=0.5,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,sa
 		
 		sat_index <- (1+(-alpha*psi)^n)^(-m)
 		
-	}else{
+	}else if (type_swc=="BrooksAndCorey"){
+		
+		psiloc <- psi 
+		psi[psi>psi_s] <- psi_s
+		psirel <- psi/psi_s
+		sat <- psirel^(-1/lambda)
+		
+	} else {
 		return(NA)
 	}
 	theta <- sat_index*(theta_sat-theta_res)+theta_res
@@ -101,14 +116,20 @@ NULL
 
 #'  
 
-khy <- function (psi=0.5,v=0.5,ksat=0.01,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,type_swc="VanGenuchten",type_khy="Mualem",...) {
+khy <- function (psi=0.5,v=0.5,ksat=0.01,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,psi_s=-1/alpha,lambda=m*n,b=NA,type_swc="VanGenuchten",type_khy=c("Mualem","BrooksAndCorey"),...) {
   
-  
+  if (length(type_khy)>1) type_khy <- type_khy[1]
+	
   if (type_khy=="Mualem") {
-  s <- swc(psi=psi,alpha=alpha,m=m,n=n,theta_sat=theta_sat,theta_res=theta_res,saturation_index=TRUE,...)
+  s <- soilwater::swc(psi=psi,alpha=alpha,m=m,n=n,theta_sat=theta_sat,theta_res=theta_res,psi_s=psi_s,lambda=lambda,type_swc=type_swc,saturation_index=TRUE,...)
   
   k <- ksat*s^v*(1-(1-s^(1/m))^m)^2
-}else{
+}else if (type_khy=="BrooksAndCorey") {
+	
+	s <- soilwater::swc(psi=psi,alpha=alpha,m=m,n=n,theta_sat=theta_sat,theta_res=theta_res,psi_s=psi_s,lambda=lambda,type_swc=type_swc,saturation_index=TRUE,...)
+	k <- ksat*s^b
+	
+} else {	
 	k<- NA
 }
   return(k)
@@ -144,8 +165,8 @@ NULL
 # hydraulic diffusivity 
 diffusivity <- function (psi=0.5,v=0.5,ksat=0.01,alpha=1.0,n=1.5,m=1-1/n,theta_sat=0.4,theta_res=0.05,...) {
   
-  k <- khy(psi=psi,v=v,ksat=ksat,alpha=alpha,n=n,m=m,theta_sat=theta_sat,theta_res=theta_res,...)
-  C <- cap(psi=psi,alpha=alpha,n=n,theta_sat=theta_sat,theta_res=theta_res,...)
+  k <- soilwater::khy(psi=psi,v=v,ksat=ksat,alpha=alpha,n=n,m=m,theta_sat=theta_sat,theta_res=theta_res,...)
+  C <- soilwater::cap(psi=psi,alpha=alpha,n=n,theta_sat=theta_sat,theta_res=theta_res,...)
   
   return(k/C) 
   
